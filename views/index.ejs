@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: gilroy;
+    }
+    html,body{
+        width: 100%;
+        height: 100%;
+    }
+    #main{
+      width: 100%;
+      height: 100%;
+      background-color: beige;
+    }
+    .msgbox{
+      width: 100%;
+      height: 85%;
+      background-color: beige;
+      padding: 2vw;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5vw;
+      overflow: auto;
+    }
+    .msgbox::-webkit-scrollbar{
+      display: none;
+    }
+    .sendbox{
+      width: 100%;
+      height: 15%;
+      display: flex;
+      border: none;
+
+    }
+    .userinput{
+      width: 85%;
+      height: 100%;
+      background-color: #fff;
+      border: none;
+      outline: none;
+      font-size: 2vw;
+      padding: 10px;
+    }
+    #sentmsg{
+      width: 15%;
+      height: 100%;
+      background-color: rgb(18, 237, 18);
+      color: #fff;
+      font-size: 1.5vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.3vw;
+      border: none;
+      outline: none;
+    }
+    .message{
+      width: fit-content;
+      background-color: green;
+      padding: 5px 10px;
+      font-size: 1.3vw;
+      color: #fff;
+      border-radius: 20px;
+    }
+    #fixed{
+      width: 100%;
+      height: 100%;
+      background-color: rgba(201, 193, 191, 0.4);
+      position: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .box{
+      width: fit-content;
+      height: fit-content;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-radius: 20px;
+      padding: 25px;
+    }
+    .name{
+      width: 20vw;
+      height: 5vh;
+      font-size: 1.3vw;
+      padding: 20px;
+    }
+    #setname{
+      width: 20vw;
+      height: 5vh;
+      background-color: blue;
+      color: #fff;
+      font-size: 1.2vw;
+      text-transform: capitalize;
+      border: none;
+    }
+    .profile{
+      width: fit-content;
+      position: absolute;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      padding: 2vw;
+      display: none;
+    }
+    #username{
+      margin-right: 40px;
+    }
+
+    #online-log h3{
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    
+    #online-log i{
+      font-size: 30px;
+      font-weight: 100;
+    }
+
+    #onlinenumber{
+      display: inline;
+      margin-left: 10px;
+    }
+
+    #users{
+      width: 200px;
+      height: 300px;
+      background-color: #fff;
+      overflow: auto;
+      display: none;
+      /* border: 1px solid #000; */
+    }
+    #users::-webkit-scrollbar{
+      width: 10px;
+    }
+    #users::-webkit-scrollbar-thumb{
+      border-radius: 10px;
+      background-color: #111111;
+    }
+    #users .user{
+      display: flex;
+      align-items: center;
+      padding: 5px 20px;
+      border-bottom: 1px solid #000;
+    }
+    #users h4{
+      font-size: 25px;
+      /* margin-bottom: 10px; */
+      margin-left: 10px;
+    }
+
+    #typing{
+      top: 83%;
+      left: 50%;
+      position: absolute;
+      transform: translate(-50%,-50%);
+      opacity: 0;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="fixed">
+    <div class="box">
+      <input type="text" class="name" >
+      <button id="setname" >sent name</button>
+    </div>
+  </div>
+ 
+
+
+
+  <div id="main">
+    <div class="profile">
+      👤<h3 id="username"> Username</h3>
+      <div id="online-log">
+        <h3>🟢 <span id="onlinenumber">10</span><i class="ri-arrow-drop-down-line"></i></h3>
+        <div id="users">  
+          
+        </div>
+      </div>
+    </div>
+
+    <h5 id="typing"><span id="usertyping">user</span> is typing...</h5>
+    
+    <div class="msgbox">
+      
+      
+    </div>
+    <div class="sendbox">
+      <input type="text" class="userinput" placeholder="write messages">
+      <button id="sentmsg"> send messages<i class="ri-send-plane-2-fill"></i></button>
+  </div>
+</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js" integrity="sha512-xbQU0+iHqhVt7VIXi6vBJKPh3IQBF5B84sSHdjKiSccyX/1ZI7Vnkt2/8y8uruj63/DVmCxfUNohPNruthTEQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      var socket = io();
+
+
+      var userinput= document.querySelector(".userinput");
+      var msgContainer=document.querySelector(".msgbox")
+        document.querySelector("#sentmsg").addEventListener("click",function(){
+          if(userinput.value.trim().length>0){
+            socket.emit("msg", { name:nameinput.value,msg:userinput.value})
+            userinput.value = "";
+
+          }
+        })
+        socket.on("message",function(data){
+             var textMsg=`
+             <div class="message">
+              <h3>${data.name}:${data.msg}</h3>
+            </div>`;
+            msgContainer.innerHTML+=textMsg;
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+          
+        })
+          var nameinput=document.querySelector(".name");
+          var userss=document.querySelector("#users")
+        document.querySelector("#setname").addEventListener("click",function(){
+          if(nameinput.value.trim().length>3){
+            document.querySelector("#fixed").style.display="none";
+            document.querySelector(".profile").style.display="flex";
+            document.querySelector("#username").textContent=nameinput.value
+            socket.emit("setcount", nameinput.value)
+          }
+        })
+        socket.on("online",function(data){
+          document.querySelector("#onlinenumber").textContent=data.length
+
+          var clutter = "";
+          data.forEach(function(elem){
+            userkanaam = `
+            <div class="user">
+            👤<h4>${elem}</h4>
+            </div>`
+            clutter += userkanaam; 
+          })
+          userss.innerHTML = clutter;
+
+        })
+        var flag=0
+        document.querySelector("#online-log h3").addEventListener('click',function(){
+          if(flag===0){
+            document.querySelector("#users").style.display = "block";
+            flag=1
+          }else{
+            document.querySelector("#users").style.display="none"
+            flag=0
+          }
+        })
+        userinput.addEventListener('input', function(){
+          socket.emit('typing')
+        })
+        var timer;
+        socket.on('typing', function(){
+          document.querySelector("#typing").style.opacity = 1
+          clearTimeout(timer);
+          timer = setTimeout(function(){
+            document.querySelector("#typing").style.opacity = 0
+          },2000)
+        });
+        // socket.on("connectedroom",function(data){
+        //   document.body.innerHTML="";
+        //   document.write(data)
+        // })
+
+
+
+
+    </script>
+</body>
+</html>
